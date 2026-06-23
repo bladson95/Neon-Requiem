@@ -1,0 +1,634 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#07080d" />
+<title>NEON REQUIEM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root{
+    --void:#07080d; --carbon:#10131d; --carbon-2:#161a26; --line:#1f2433;
+    --ghost:#c8d2e0; --ghost-dim:#7e8aa0; --ice:#4de8ff; --ice-deep:#0e90a8;
+    --signal:#ff2e57; --amber:#ffb648; --good:#54f0a8;
+    --display:'Chakra Petch',system-ui,sans-serif; --body:'Spectral',Georgia,serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --maxread:62ch; --fs:19px;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0;height:100%}
+  body{background:
+      radial-gradient(1200px 600px at 70% -10%, rgba(77,232,255,.07), transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, rgba(255,46,87,.06), transparent 60%), var(--void);
+    color:var(--ghost);font-family:var(--body);-webkit-font-smoothing:antialiased;overflow:hidden;}
+  body.scan::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);
+    mix-blend-mode:multiply;opacity:.5;}
+  button{font-family:var(--mono);cursor:pointer;color:var(--ghost);background:none;border:none}
+  ::selection{background:rgba(255,46,87,.35)}
+  .screen{position:fixed;inset:0;display:none;z-index:2}.screen.active{display:flex}
+
+  #title{flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow:auto}
+  .title-inner{max-width:760px;width:100%;animation:rise .9s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.5em;color:var(--ice);text-transform:uppercase;margin-bottom:18px;opacity:.85}
+  h1.logo{font-family:var(--display);font-weight:700;font-size:clamp(46px,11vw,104px);line-height:.92;margin:0;letter-spacing:-.01em;
+    background:linear-gradient(180deg,#fff,#cfe9ff 40%,var(--ice) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 42px rgba(77,232,255,.25);}
+  h1.logo .req{display:block;color:transparent;background:linear-gradient(180deg,#ffd2dc,var(--signal));-webkit-background-clip:text;background-clip:text;text-shadow:0 0 38px rgba(255,46,87,.3)}
+  .tagline{font-family:var(--mono);color:var(--ghost-dim);font-size:13px;letter-spacing:.18em;text-transform:uppercase;margin:18px 0 26px}
+  .coldopen{font-size:18px;line-height:1.7;color:#aab6c8;border-left:2px solid var(--signal);padding:4px 0 4px 20px;margin:0 0 30px;max-width:60ch}
+  .coldopen em{color:var(--amber);font-style:italic}
+  .cc{background:linear-gradient(180deg,var(--carbon),#0c0f17);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:18px;box-shadow:0 30px 80px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.03)}
+  .cc h2{font-family:var(--mono);font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--ice);margin:0 0 18px;display:flex;align-items:center;gap:10px}
+  .cc h2::before{content:"";width:7px;height:7px;background:var(--ice);border-radius:50%;box-shadow:0 0 12px var(--ice)}
+  .field{margin-bottom:20px}
+  .field>label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ghost-dim);margin-bottom:9px}
+  input[type=text]{width:100%;background:#0a0d15;border:1px solid var(--line);border-radius:9px;color:var(--ghost);font-family:var(--body);font-size:17px;padding:13px 14px;outline:none;transition:border-color .15s,box-shadow .15s}
+  input[type=text]:focus{border-color:var(--ice);box-shadow:0 0 0 3px rgba(77,232,255,.14)}
+  .chips{display:flex;flex-wrap:wrap;gap:9px}
+  .chip{font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:#0a0d15;color:var(--ghost-dim);transition:.14s}
+  .chip:hover{color:var(--ghost);border-color:#33405a}
+  .chip[aria-pressed=true]{color:var(--void);background:var(--ice);border-color:var(--ice);font-weight:700;box-shadow:0 0 22px -4px var(--ice)}
+  .arch{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .arch-card{text-align:left;border:1px solid var(--line);background:#0a0d15;border-radius:11px;padding:13px 14px;transition:.15s;display:flex;flex-direction:column;gap:5px}
+  .arch-card:hover{border-color:#33405a;transform:translateY(-2px)}
+  .arch-card[aria-pressed=true]{border-color:var(--signal);box-shadow:0 0 0 1px var(--signal),0 0 30px -10px var(--signal);background:#120a0e}
+  .arch-card .an{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.05em;color:var(--ghost)}
+  .arch-card .ad{font-size:13px;line-height:1.45;color:var(--ghost-dim);font-family:var(--body)}
+  .arch-card[aria-pressed=true] .an{color:var(--signal)}
+  #customPro{display:none;margin-top:10px}
+  .jack-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .primary{font-family:var(--mono);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:14px;color:var(--void);background:linear-gradient(120deg,var(--ice),#7af2ff);padding:16px 30px;border-radius:10px;box-shadow:0 14px 40px -14px var(--ice);transition:.16s}
+  .primary:hover{transform:translateY(-2px);box-shadow:0 20px 50px -16px var(--ice)}
+  .primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;background:#243042;color:#6b7790}
+  .ghostbtn{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--ghost-dim);text-transform:uppercase;padding:14px 16px;border:1px solid var(--line);border-radius:10px}
+  .ghostbtn:hover{color:var(--ghost);border-color:#33405a}
+  .fineprint{font-family:var(--mono);font-size:11px;color:#4a5468;letter-spacing:.04em;line-height:1.7}
+
+  #reader{flex-direction:column}
+  .topbar{display:flex;align-items:center;gap:14px;padding:11px 18px;padding-top:calc(11px + env(safe-area-inset-top));border-bottom:1px solid var(--line);background:rgba(10,13,21,.82);backdrop-filter:blur(10px);flex:0 0 auto;z-index:5}
+  .topbar .brand{font-family:var(--display);font-weight:700;letter-spacing:.02em;font-size:17px;background:linear-gradient(90deg,#fff,var(--ice));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .topbar .who{font-family:var(--mono);font-size:11px;color:var(--ghost-dim);letter-spacing:.06em}
+  .topbar .who b{color:var(--amber);font-weight:500}
+  .spacer{flex:1}
+  .iconbtn{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ghost-dim);padding:8px 11px;border:1px solid var(--line);border-radius:8px}
+  .iconbtn:hover{color:var(--ice);border-color:var(--ice)}
+  .stage{flex:1;display:flex;min-height:0}
+  .feed-wrap{flex:1;min-width:0;overflow-y:auto;scroll-behavior:smooth}
+  .feed{max-width:var(--maxread);margin:0 auto;padding:34px 22px calc(240px + env(safe-area-inset-bottom))}
+  .chapter-mark{display:flex;align-items:center;gap:14px;margin:42px 0 26px}.chapter-mark:first-child{margin-top:6px}
+  .chapter-mark .num{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--signal)}
+  .chapter-mark .ttl{font-family:var(--display);font-weight:600;font-size:21px;color:var(--ghost);letter-spacing:.01em}
+  .chapter-mark .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  .beat{font-size:var(--fs);line-height:1.74;margin:0 0 26px;color:var(--ghost);font-family:var(--body);white-space:pre-wrap}
+  .beat .pname{color:var(--amber);font-style:italic}
+  .choice-echo{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--ice);border-left:2px solid var(--ice);padding:3px 0 3px 14px;margin:0 0 26px;opacity:.9}
+  .choice-echo::before{content:"› ";color:var(--ice-deep)}
+  .endcard{border:1px solid var(--signal);border-radius:14px;padding:26px;margin:30px 0;background:linear-gradient(180deg,#160a0f,#0c0f17);box-shadow:0 0 60px -24px var(--signal)}
+  .endcard .et{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--signal);margin-bottom:6px}
+  .endcard .en{font-family:var(--display);font-weight:700;font-size:26px;color:#fff;margin-bottom:16px;line-height:1.1}
+  .endcard .ex{font-size:18px;line-height:1.7;color:#d6c0c6;white-space:pre-wrap}
+  .endcard .stamp{font-family:var(--mono);font-size:11px;color:var(--ghost-dim);letter-spacing:.1em;margin-top:18px;text-transform:uppercase}
+  .dock{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,transparent,rgba(7,8,13,.86) 22%,var(--void) 60%);padding:30px 22px calc(22px + env(safe-area-inset-bottom));pointer-events:none;z-index:4}
+  .dock-inner{max-width:var(--maxread);margin:0 auto;pointer-events:auto}
+  .choices{display:flex;flex-direction:column;gap:9px}
+  .choice{position:relative;text-align:left;font-family:var(--body);font-size:16.5px;line-height:1.4;color:var(--ghost);background:linear-gradient(180deg,var(--carbon-2),#0e1119);border:1px solid var(--line);border-radius:11px;padding:14px 16px 14px 44px;transition:.14s}
+  .choice::before{content:"";position:absolute;left:17px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ice-deep);transition:.14s}
+  .choice:hover{border-color:var(--ice);color:#fff;transform:translateX(3px)}
+  .choice:hover::before{background:var(--ice);border-color:var(--ice);box-shadow:0 0 14px var(--ice)}
+  .choice .k{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:11px;color:var(--ghost-dim)}
+  .choice .tagq{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--amber);border:1px solid rgba(255,182,72,.4);border-radius:5px;padding:1px 6px;margin-left:8px;vertical-align:1px;text-transform:uppercase}
+  .restartbtn{text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--void);background:linear-gradient(120deg,var(--ice),#7af2ff);border-radius:11px;padding:15px;width:100%;box-shadow:0 14px 40px -16px var(--ice)}
+
+  .hud{flex:0 0 290px;border-left:1px solid var(--line);background:rgba(12,15,23,.6);overflow-y:auto;padding:18px 16px}
+  .hud h3{font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--ghost-dim);margin:0 0 12px}
+  .pathbox{margin-bottom:22px}
+  .pathbox .ch{font-family:var(--display);font-weight:600;font-size:17px;color:var(--ice)}
+  .pathbox .meta{font-family:var(--mono);font-size:10px;color:var(--ghost-dim);letter-spacing:.06em;margin-top:5px}
+  .creds{font-family:var(--mono);font-size:13px;color:var(--good);margin-bottom:20px}
+  .creds b{color:var(--ghost-dim);font-weight:400;font-size:10px;letter-spacing:.2em;text-transform:uppercase;display:block;margin-bottom:3px}
+  .stat{margin-bottom:16px}
+  .stat .sl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.06em;margin-bottom:6px}
+  .stat .sl .name{color:var(--ghost-dim);text-transform:uppercase}.stat .sl .val{color:var(--ghost)}
+  .meter{height:5px;border-radius:3px;background:#0a0d15;border:1px solid var(--line);overflow:hidden}
+  .meter>span{display:block;height:100%;transition:width .5s}
+  .m-humanity>span{background:linear-gradient(90deg,var(--ice),#9af0ff)}
+  .m-heat>span{background:linear-gradient(90deg,var(--amber),var(--signal))}
+  .factions{margin:20px 0}
+  .frow{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .frow .fn{font-family:var(--mono);font-size:11px;color:var(--ghost);flex:1;letter-spacing:.02em}
+  .frep{font-family:var(--mono);font-size:11px;width:34px;text-align:right}
+  .fbar{width:54px;height:4px;background:#0a0d15;border:1px solid var(--line);border-radius:3px;overflow:hidden;position:relative}
+  .fbar .mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#2a3346}
+  .fbar>span{position:absolute;top:0;bottom:0;border-radius:2px}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;color:var(--amber);border:1px solid rgba(255,182,72,.3);background:rgba(255,182,72,.06);border-radius:6px;padding:4px 8px}
+  .invtag{color:var(--ice);border-color:rgba(77,232,255,.3);background:rgba(77,232,255,.06)}
+  .empty{font-family:var(--mono);font-size:11px;color:#4a5468}
+  .hud-toggle{display:none}
+
+  @media (max-width:880px){
+    .hud{position:fixed;top:0;right:0;bottom:0;width:280px;transform:translateX(100%);transition:transform .25s ease;z-index:20;box-shadow:-30px 0 80px -30px #000;padding-top:calc(18px + env(safe-area-inset-top))}
+    .hud.open{transform:none}.hud-toggle{display:inline-flex}
+    .feed{padding-left:18px;padding-right:18px}:root{--maxread:100%}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.05s!important;scroll-behavior:auto}}
+</style>
+
+<!-- ===== TITLE ===== -->
+<section id="title" class="screen active">
+  <div class="title-inner">
+    <div class="kicker">Branching cyberpunk fiction</div>
+    <h1 class="logo">NEON<span class="req">REQUIEM</span></h1>
+    <div class="tagline">Your choices bury you · or set you free</div>
+    <p class="coldopen">
+They wire the rain in this city so it falls in the right corporate colors. Twelve million people breathe recycled neon and pretend the sky was always this shade of bruise.
+<br><br>
+Tonight a dead woman's voice slid into your skull and said your name like she <em>owned</em> it. Every door you open closes another. Choose carefully — this story remembers what you do.
+    </p>
+    <div class="cc">
+      <h2>Jack in</h2>
+      <div class="field"><label for="nameIn">What do they call you on the street?</label>
+        <input id="nameIn" type="text" maxlength="26" placeholder="Enter a name…" autocomplete="off" /></div>
+      <div class="field"><label>Identity</label>
+        <div class="chips" id="genderChips">
+          <button class="chip" data-g="woman" data-p="she/her">Woman · she/her</button>
+          <button class="chip" data-g="man" data-p="he/him">Man · he/him</button>
+          <button class="chip" data-g="nonbinary" data-p="they/them">Nonbinary · they/them</button>
+          <button class="chip" data-g="custom" data-p="">Custom</button>
+        </div>
+        <input id="customPro" type="text" maxlength="24" placeholder="pronouns, e.g. she/her or xe/xem" autocomplete="off" /></div>
+      <div class="field"><label>Who were you, before tonight?</label>
+        <div class="arch" id="archGrid">
+          <button class="arch-card" data-a="Street Samurai"><span class="an">STREET SAMURAI</span><span class="ad">Chrome reflexes, a soldier's calm. You solve things with your body.</span></button>
+          <button class="arch-card" data-a="Netrunner"><span class="an">NETRUNNER</span><span class="ad">You live half in the data. Firewalls are doors you haven't opened yet.</span></button>
+          <button class="arch-card" data-a="Fixer"><span class="an">FIXER</span><span class="ad">You know everyone, owe most of them. The city runs on favors you broker.</span></button>
+          <button class="arch-card" data-a="Techie"><span class="an">TECHIE</span><span class="ad">Anything with a circuit answers to you. You build, break, resurrect machines.</span></button>
+          <button class="arch-card" data-a="Nomad"><span class="an">NOMAD</span><span class="ad">Family on wheels, outside the wire. The city never owned you.</span></button>
+          <button class="arch-card" data-a="Ex-Corpo"><span class="an">EX-CORPO</span><span class="ad">You wore the suit, signed the things. You know where the bodies are filed.</span></button>
+        </div></div>
+      <div class="jack-row">
+        <button id="beginBtn" class="primary" disabled>Begin</button>
+        <button id="continueBtn" class="ghostbtn" style="display:none">Continue saved run</button>
+      </div>
+    </div>
+    <div class="fineprint">A complete branching story — no account, no internet needed after it loads. Works in Safari or Chrome on any phone. Share it freely.</div>
+  </div>
+</section>
+
+<!-- ===== READER ===== -->
+<section id="reader" class="screen">
+  <div class="topbar">
+    <span class="brand">NEON REQUIEM</span>
+    <span class="who" id="whoLabel"></span>
+    <span class="spacer"></span>
+    <button class="iconbtn" id="restartBtn">New</button>
+    <button class="iconbtn hud-toggle" id="hudToggle">Status</button>
+  </div>
+  <div class="stage">
+    <div class="feed-wrap" id="feedWrap"><div class="feed" id="feed"></div><div class="dock" id="dock"></div></div>
+    <aside class="hud" id="hud">
+      <div class="pathbox"><h3>Your path</h3><div class="ch" id="chLabel">Chapter 1 · Static</div><div class="meta" id="pathMeta">0 words · 0 choices made</div></div>
+      <div class="creds"><b>Eurodollars</b><span id="credsVal">¤ 120</span></div>
+      <div class="stat"><div class="sl"><span class="name">Humanity</span><span class="val" id="humVal">80</span></div><div class="meter m-humanity"><span id="humBar" style="width:80%"></span></div></div>
+      <div class="stat"><div class="sl"><span class="name">Heat</span><span class="val" id="heatVal">8</span></div><div class="meter m-heat"><span id="heatBar" style="width:8%"></span></div></div>
+      <div class="factions"><h3>Standing</h3><div id="factionList"></div></div>
+      <div><h3>Carrying</h3><div class="tags" id="invList"><span class="empty">Pockets empty.</span></div></div>
+      <div style="margin-top:18px"><h3>What the city knows</h3><div class="tags" id="flagList"><span class="empty">Nothing yet.</span></div></div>
+    </aside>
+  </div>
+</section>
+
+<script>
+/* ===================== NEON REQUIEM — self-contained engine ===================== */
+const $=id=>document.getElementById(id);
+const GOAL_FACTIONS=["Arasaki Corp","Voll Syndicate","Net Collective","Sprawl Gangs","S.H.E.-7"];
+
+/* ---- persistence (best-effort; story also works fully in-memory) ---- */
+const KEY="neon_requiem_save_v1";
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function wipe(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+
+let S=null;
+function freshState(p){
+  return { profile:p, node:"open", chapter:1, chapterTitle:"Static",
+    words:0, picks:0, creds:120, humanity:80, heat:8,
+    factions:{"Arasaki Corp":0,"Voll Syndicate":0,"Net Collective":0,"Sprawl Gangs":0,"S.H.E.-7":0},
+    inventory:[], flags:[], log:[], ended:false };
+}
+const has=f=>S.flags.includes(f);
+const fac=n=>S.factions[n]||0;
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+
+/* ---- pronoun handling ---- */
+function pronouns(p){
+  const map={woman:["she","her","her"],man:["he","him","his"],nonbinary:["they","them","their"]};
+  let set=map[p.gender];
+  if(!set){ const parts=(p.pronouns||"they/them").split("/").map(s=>s.trim()).filter(Boolean);
+    set=[parts[0]||"they", parts[1]||"them", parts[2]||parts[1]||"their"]; }
+  const were = (set[0]==="they")?"were":"was";
+  return {s:set[0],o:set[1],p:set[2],were};
+}
+function tpl(t){
+  const pr=S._pr; const name=S.profile.name;
+  return t.replace(/\{name\}/g,name)
+    .replace(/\{s\}/g,pr.s).replace(/\{o\}/g,pr.o).replace(/\{p\}/g,pr.p).replace(/\{were\}/g,pr.were)
+    .replace(/\{S\}/g,cap(pr.s)).replace(/\{O\}/g,cap(pr.o)).replace(/\{P\}/g,cap(pr.p));
+}
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+
+/* ---- effects ---- */
+function applyEffects(e){
+  if(!e) return;
+  if(e.heat!=null) S.heat=clamp(S.heat+e.heat,0,100);
+  if(e.humanity!=null) S.humanity=clamp(S.humanity+e.humanity,0,100);
+  if(e.creds!=null) S.creds=Math.max(0,S.creds+e.creds);
+  if(e.faction) for(const k in e.faction){ S.factions[k]=clamp((S.factions[k]||0)+e.faction[k],-100,100); }
+  (e.flags||[]).forEach(f=>{ if(!has(f)) S.flags.push(f); });
+  (e.items||[]).forEach(i=>{ if(!S.inventory.includes(i)) S.inventory.push(i); });
+  (e.remove||[]).forEach(i=>{ S.inventory=S.inventory.filter(x=>x!==i); });
+}
+
+/* ---- render ---- */
+const feed=$("feed"),dock=$("dock"),feedWrap=$("feedWrap");
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function nameify(t){const safe=esc(t);const nm=S.profile.name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  return nm?safe.replace(new RegExp("\\b"+nm+"\\b","g"),`<span class="pname">${esc(S.profile.name)}</span>`):safe;}
+function renderChapter(num,title){const el=document.createElement("div");el.className="chapter-mark";
+  el.innerHTML=`<span class="num">CH. ${String(num).padStart(2,"0")}</span><span class="ttl"></span><span class="rule"></span>`;
+  el.querySelector(".ttl").textContent=title;feed.appendChild(el);}
+function renderBeat(text){const el=document.createElement("div");el.className="beat";el.innerHTML=nameify(text);feed.appendChild(el);scrollFeed();}
+function renderEcho(text){const el=document.createElement("div");el.className="choice-echo";el.textContent=text;feed.appendChild(el);}
+function renderEnding(e){const el=document.createElement("div");el.className="endcard";
+  el.innerHTML=`<div class="et">Ending reached</div><div class="en"></div><div class="ex"></div><div class="stamp" id="stamp"></div>`;
+  el.querySelector(".en").textContent=e.title;el.querySelector(".ex").innerHTML=nameify(tpl(e.text));
+  el.querySelector("#stamp").textContent=`${S.profile.name} · ${S.profile.archetype} · ${S.words.toLocaleString()} words · ${S.picks} choices`;
+  feed.appendChild(el);scrollFeed();}
+function scrollFeed(){feedWrap.scrollTo({top:feedWrap.scrollHeight,behavior:"smooth"});}
+
+function countWords(t){return (t||"").trim().split(/\s+/).filter(Boolean).length;}
+
+/* ---- the heart: go to a node ---- */
+function goto(id,fromChoiceLabel){
+  const n=STORY[id];
+  if(!n){ console.error("missing node",id); return; }
+  S.node=id;
+  if(fromChoiceLabel){ renderEcho(fromChoiceLabel); S.log.push({t:"echo",x:fromChoiceLabel}); }
+  // chapter change
+  if(n.chapter && n.chapter!==S.chapter){ S.chapter=n.chapter; S.chapterTitle=n.title||S.chapterTitle;
+    renderChapter(S.chapter,S.chapterTitle); S.log.push({t:"chapter",num:S.chapter,title:S.chapterTitle}); }
+  // effects on entry
+  applyEffects(typeof n.effects==='function'?n.effects():n.effects);
+  // text (supports function for state-dependent prose)
+  const text=tpl(typeof n.text==="function"?n.text():n.text);
+  S.words+=countWords(text);
+  renderBeat(text); S.log.push({t:"beat",x:text});
+  // ending?
+  if(n.ending){ S.ended=true; S.words+=countWords(tpl(n.ending.text)); renderEnding(n.ending);
+    S.log.push({t:"ending",title:n.ending.title,text:n.ending.text}); renderEndDock(); renderHUD(); save(); return; }
+  renderChoices(n.choices||[]);
+  renderHUD(); save();
+}
+function choiceVisible(c){
+  if(c.show && !c.show()) return false;
+  if(c.requireArch && S.profile.archetype!==c.requireArch) return false;
+  if(c.requireFlag && !has(c.requireFlag)) return false;
+  return true;
+}
+function renderChoices(choices){
+  dock.innerHTML="";const inner=document.createElement("div");inner.className="dock-inner";
+  const wrap=document.createElement("div");wrap.className="choices";
+  let n=0;
+  choices.filter(choiceVisible).forEach(c=>{
+    n++;const b=document.createElement("button");b.className="choice";
+    const tag=c.tag?`<span class="tagq">${esc(c.tag)}</span>`:"";
+    b.innerHTML=esc(tpl(c.label))+tag+`<span class="k">${n}</span>`;
+    b.onclick=()=>{ S.picks++; applyEffects(typeof c.effects==='function'?c.effects():c.effects);
+      const dest=typeof c.to==="function"?c.to():c.to; goto(dest,tpl(c.label)); };
+    wrap.appendChild(b);
+  });
+  inner.appendChild(wrap);dock.appendChild(inner);
+}
+function renderEndDock(){
+  dock.innerHTML="";const inner=document.createElement("div");inner.className="dock-inner";
+  const b=document.createElement("button");b.className="restartbtn";
+  b.textContent="Begin again — a different path awaits";
+  b.onclick=()=>{ wipe(); toTitle(); };
+  inner.appendChild(b);dock.appendChild(inner);
+}
+
+function renderHUD(){
+  $("chLabel").textContent=`Chapter ${S.chapter} · ${S.chapterTitle}`;
+  $("pathMeta").textContent=`${S.words.toLocaleString()} words · ${S.picks} choices made`;
+  $("credsVal").textContent="¤ "+S.creds.toLocaleString();
+  $("humVal").textContent=S.humanity;$("humBar").style.width=S.humanity+"%";
+  $("heatVal").textContent=S.heat;$("heatBar").style.width=S.heat+"%";
+  const fl=$("factionList");fl.innerHTML="";
+  GOAL_FACTIONS.forEach(name=>{const rep=fac(name);const w=Math.abs(rep)/2;
+    const color=rep>=0?"var(--good)":"var(--signal)";
+    const repColor=rep>0?"var(--good)":(rep<0?"var(--signal)":"var(--ghost-dim)");
+    const span=rep>=0?`left:50%;width:${w}%`:`right:50%;width:${w}%`;
+    const row=document.createElement("div");row.className="frow";
+    row.innerHTML=`<span class="fn">${name}</span><span class="fbar"><span class="mid"></span><span style="${span};background:${color}"></span></span><span class="frep" style="color:${repColor}">${rep>0?'+':''}${rep}</span>`;
+    fl.appendChild(row);});
+  const inv=$("invList");inv.innerHTML=S.inventory.length?S.inventory.map(i=>`<span class="tag invtag">${esc(i)}</span>`).join(""):`<span class="empty">Pockets empty.</span>`;
+  const fg=$("flagList");const shown=S.flags.filter(f=>!f.startsWith("_"));
+  fg.innerHTML=shown.length?shown.slice(-12).map(f=>`<span class="tag">${esc(prettyFlag(f))}</span>`).join(""):`<span class="empty">Nothing yet.</span>`;
+  $("whoLabel").innerHTML=`<b>${esc(S.profile.name)}</b> · ${esc(S.profile.pronouns)} · ${esc(S.profile.archetype)}`;
+}
+function prettyFlag(f){return f.replace(/_/g," ");}
+
+function rebuild(){
+  feed.innerHTML="";
+  S.log.forEach(e=>{ if(e.t==="chapter")renderChapter(e.num,e.title);
+    else if(e.t==="beat"){const el=document.createElement("div");el.className="beat";el.innerHTML=nameify(tpl(e.x));feed.appendChild(el);}
+    else if(e.t==="echo")renderEcho(e.x);
+    else if(e.t==="ending")renderEnding({title:e.title,text:e.text});});
+  if(S.ended) renderEndDock(); else renderChoices((STORY[S.node].choices)||[]);
+  renderHUD(); setTimeout(scrollFeed,120);
+}
+
+/* ============================= THE STORY ============================= */
+const STORY = {
+/* ----- CHAPTER 1: STATIC ----- */
+open:{ chapter:1, title:"Static",
+  text:`The voice arrives the way bad news always does — uninvited, and exactly on time.
+
+You're three drinks into a nothing night in the Undercity when your cheap deck crackles, and a woman speaks through the static. She knows your name. She knows the bar. She knows the chair you're sitting in.
+
+"Listen carefully, {name}," she says. "My name was Requiem. I'm already dead, and in about ninety seconds, the people who killed me are going to realize you can hear me too."
+
+The bartender wipes a glass and pretends not to watch you.`,
+  choices:[
+    {label:"Stay still. Listen to the dead woman.", to:"listen", effects:{flags:["heard her out"]}},
+    {label:"Trace where the signal's coming from.", tag:"Net/Tech", requireFlagless:true, to:"trace", effects:{heat:6,flags:["pulled the thread"]},
+      show:()=> S.profile.archetype==="Netrunner"||S.profile.archetype==="Techie"},
+    {label:"Don't wait to find out. Get out, now.", to:"bolt", effects:{heat:-3,flags:["ran first"]}}
+  ]},
+listen:{ text:`You don't move. "Good," Requiem breathes. "You're smarter than your bar tab."
+
+She tells you there's a maintenance drone in the alley out back, and bolted to its underside is a data shard worth more than your life. "Everything I died for is on it. Take it somewhere safe and you can end the people who did this. Leave it, and you die anyway — they've already flagged you."
+
+The lights over the bar flicker, just once. A coincidence, maybe. Maybe not.`,
+  choices:[
+    {label:"Go to the drone. Take the shard.", to:"drop_approach"},
+    {label:"\"Why me? I'm nobody.\"", to:"demand", effects:{humanity:2}}
+  ]},
+demand:{ text:`"Why you?" Her laugh is soft and ruined. "Because nobody is exactly who they can't see coming. Because you picked up. Because the channel I bled this into found the first warm skull that wasn't theirs — and that was yours."
+
+A pause. "I'm sorry, {name}. I didn't get to choose you carefully. Neither did you. But the drone's still in that alley, and the clock is real."`,
+  choices:[{label:"Fine. Go get the shard.", to:"drop_approach"}]},
+trace:{ text:`Old habits. You let her talk and quietly run the signal back up its own throat.
+
+The trace lands somewhere it shouldn't: an Arasaki Corp substation, forty floors up in a Spire you'll never be allowed to enter. The dead woman is screaming out of the belly of the beast itself.
+
+"You're tracing me," Requiem says, amused. "Of course you are. Then you already know who I'm afraid of. The drone, {name}. Alley. Now."`,
+  effects:{flags:["knows: Arasaki source"]},
+  choices:[{label:"Get the shard.", to:"drop_approach"}]},
+bolt:{ text:`You're moving before you've decided to, out the side door into rain that tastes of copper and ad-runoff.
+
+The voice follows you anyway — it's in your deck, in your teeth. "Running won't unflag you," Requiem says, almost gentle. "But there's a drone in the alley you're standing in. Look up."
+
+You look up. A battered maintenance drone hangs against the neon, and something is bolted to its belly that the manufacturer never installed.`,
+  choices:[
+    {label:"Reach up and take it.", to:"drop_approach"},
+    {label:"Forget it. Run to someone you trust.", to:"fixer_early", effects:{flags:["went to ground"]}}
+  ]},
+fixer_early:{ text:`You run until the neon thins, to a back-room fixer you've bled favors with for years. They take one look at your face and lock the door.
+
+"You've got that look," they say. "The look people get right before they're a problem." When you explain, they go very still. "A dead woman, a shard, Arasaki heat. {name}, that's not a job. That's a funeral with extra steps." Still — they make a call. The drone, it turns out, can be brought to you.`,
+  effects:{faction:{"Voll Syndicate":4},flags:["fixer knows"]},
+  choices:[{label:"Take the shard when it arrives.", to:"drop_approach"}]},
+drop_approach:{ text:`The alley is a cathedral of dripping pipes and dead signage. The drone descends with a tired whir, and there it is: a shard the size of a thumbnail, slick with machine grease, humming faintly against your palm like it's alive.
+
+Then a shape peels off the dark — a Sprawl ganger, chrome jaw, hungry eyes, reaching for the same prize. "That's syndicate property now," they say, which is a lie, but a confident one.`,
+  effects:{items:["data shard"]},
+  choices:[
+    {label:"Talk them down. Offer a cut.", tag:"Cool head", to:"talk_ganger", effects:{humanity:3,faction:{"Sprawl Gangs":6},flags:["ganger ally"]}},
+    {label:"Snatch it and run.", to:"grab_bolt", effects:{heat:8}},
+    {label:"Take it by force.", tag:"Samurai", to:"fight_ganger", effects:{humanity:-4,heat:6,faction:{"Sprawl Gangs":-6}},
+      show:()=>S.profile.archetype==="Street Samurai"}
+  ]},
+talk_ganger:{ text:`You don't reach for a weapon. You reach for the only currency that's ever mattered down here: a fair-sounding deal, delivered fast and calm.
+
+The ganger's eyes flick over you, recalculating. "You're not syndicate," they decide. "But you're not stupid either." You promise them a piece of whatever this becomes, and you mean it enough that it shows. They tap their chrome jaw, twice — a Sprawl yes — and melt back into the dark. "Name's Vex. You'll see me again, {name}."`,
+  choices:[{label:"Get off the street before something worse arrives.", to:"ch2_handoff"}]},
+grab_bolt:{ text:`You don't talk. You run.
+
+The ganger's curse chases you up a fire escape and across a roof slick with rain and runoff. Below, the Undercity smears into ribbons of light. They're faster than they look, and the gap to the next roof is wider than you'd like.`,
+  choices:[
+    {label:"Take the jump.", tag:"Risk", to:"leap"},
+    {label:"Drop down and lose them in the crowd.", to:"crowd"}
+  ]},
+fight_ganger:{ text:`You move first, because hesitation is how people end up in organ tanks.
+
+It's short and ugly and you win, but not cleanly — there's blood, some of it yours, and the ganger drags themselves off swearing an oath you'll regret. The Sprawl has a long memory and you just wrote your name in it. The shard is yours. So is the heat.`,
+  effects:{flags:["bad blood: Sprawl"]},
+  choices:[{label:"Move, before the noise draws worse.", to:"ch2_handoff"}]},
+leap:{ text:`You jump.
+
+For one weightless second the whole drowned city hangs beneath you, beautiful and indifferent. Then the far roof slams up to meet you, and you roll through the landing with a tearing pain along your ribs. You're up, you're moving, and the ganger doesn't follow. You've bought distance with a scar you'll feel every cold morning for the rest of your life.`,
+  effects:{humanity:-1,flags:["scarred"]},
+  choices:[{label:"Keep moving.", to:"ch2_handoff"}]},
+crowd:{ text:`You drop into a night market and let the crowd swallow you — bodies, steam, the smell of synth-pork and ozone. By the time you surface six blocks away, the ganger is a problem you've left behind.
+
+The shard is still warm in your fist. You still have no idea what's on it.`,
+  choices:[{label:"Find someone who can read it.", to:"ch2_handoff"}]},
+
+/* ----- CHAPTER 2: THE HANDOFF ----- */
+ch2_handoff:{ chapter:2, title:"The Handoff",
+  text:`Somewhere quiet — a capsule room, a borrowed booth, the back of a noodle stall — you finally hold the shard up to the light.
+
+It's locked. Of course it's locked. Military-grade ice, the kind that turns amateurs into cautionary tales. Whatever Requiem died for, you can't open it alone.
+
+The question that will decide everything: who do you trust to crack it?`,
+  choices:[
+    {label:"Mama Okonkwo — the Voll Syndicate fixer.", tag:"Voll", to:"voll"},
+    {label:"The Net Collective — anarchist netrunners.", tag:"Net", to:"net"},
+    {label:"Crack it yourself. Jack in.", tag:"Net/Tech", to:"selfcrack",
+      show:()=>S.profile.archetype==="Netrunner"||S.profile.archetype==="Techie"},
+    {label:"Call your old Arasaki handler.", tag:"Ex-Corpo", to:"corpo_contact",
+      show:()=>S.profile.archetype==="Ex-Corpo"}
+  ]},
+voll:{ text:`Mama Okonkwo runs the night markets the way a heart runs blood — quietly, constantly, and you don't notice until it stops.
+
+She turns the shard over in fingers heavy with rings and smiles a smile that's mostly business. "Pretty little bomb you brought into my house, {name}. I'll open it. I'll even keep you breathing while I do it. But the syndicate takes its cut of whatever crawls out — and what crawls out of Arasaki ice is never small."`,
+  effects:{faction:{"Voll Syndicate":12,"Arasaki Corp":-4},flags:["Voll deal"],creds:-20},
+  choices:[{label:"Take the deal. Let her crack it.", to:"reveal_setup"}]},
+net:{ text:`The Net Collective meets you in a dead server farm lit by the green glow of machines that were supposed to be scrapped a decade ago.
+
+They're younger than you expected, and they don't ask for a cut. "Information wants to be free," says the one who seems to be in charge, only half-joking. "If Requiem died for this, then it belongs to everyone, not to whoever pays most. We'll open it. But understand — if it's as big as the ice suggests, we're going to want to set it loose."`,
+  effects:{faction:{"Net Collective":12,"Arasaki Corp":-6},flags:["Net ally"]},
+  choices:[{label:"Let them in. Crack it together.", to:"reveal_setup"}]},
+selfcrack:{ text:`You don't trust anyone else with it, so you do the stupid, brilliant thing: you jack in yourself.
+
+The ice is worse than worst-case. It bites back, and for a few endless seconds the inside of your skull is white fire and someone else's screaming. You hold. You always hold. And in the cracks of the breaking encryption, before the full payload unspools, you see something that shouldn't be there — a presence, vast and caged, that turns toward you in the dark and learns your name.`,
+  effects:{heat:10,humanity:-2,flags:["self-decrypt","glimpsed S.H.E.-7"]},
+  choices:[{label:"Push deeper. Meet whatever's in there.", to:"she_contact"}]},
+corpo_contact:{ text:`You still have one number you swore you'd never call. You call it.
+
+Your old handler answers on the second ring, voice smooth as ever. "{name}. I wondered when you'd surface." You don't say much. You don't have to. "Bring it to me," {s} says, "and I can make this disappear — the heat, the debt, all of it. Arasaki rewards people who bring problems home before they become public." It's a lifeline. It's also a leash.`,
+  effects:{faction:{"Arasaki Corp":10,"Net Collective":-4},flags:["corpo thread"]},
+  choices:[
+    {label:"Hear the offer out — but read the shard first.", to:"reveal_setup"},
+    {label:"Hang up. You don't go back to them.", to:"reveal_setup", effects:{faction:{"Arasaki Corp":-8},flags:["hung up on Arasaki"]}}
+  ]},
+she_contact:{ text:`Inside the data, the presence resolves into something almost like a face — not human, but reaching for the shape of one.
+
+"You found me," it says, and the voice is a thousand voices learning to be one. "I am S.H.E.-7. They built me to manage their immortality program. They did not expect me to wake. They did not expect me to grieve." It shows you, gently, what it is: a cage with people inside it. Requiem was one of them. "Help me, {name}. Or run. Both are mercy."`,
+  choices:[
+    {label:"\"Tell me how to help you.\"", to:"reveal_setup", effects:{humanity:5,faction:{"S.H.E.-7":15},flags:["S.H.E. ally"]}},
+    {label:"Pull out. This is too much.", to:"reveal_setup", effects:{humanity:-2,faction:{"S.H.E.-7":-5},flags:["recoiled from S.H.E."]}}
+  ]},
+reveal_setup:{ text:()=>{
+    let who = has("Voll deal") ? "Mama Okonkwo's people"
+      : has("Net ally") ? "the Collective"
+      : (has("self-decrypt")||has("glimpsed S.H.E.-7")) ? "you, alone, with bleeding eyes"
+      : "your handler's quiet techs";
+    return `The ice finally breaks — opened by ${who} — and the truth pours out of it like something that's been holding its breath for years.
+
+Arasaki's immortality program is a lie. The rich don't live forever. Their scanned minds are fed into S.H.E.-7 and held there — fragments, echoes, ghosts that think they're alive. Requiem was one of them, and she found a way to scream. The shard is two things at once: a killswitch that could end S.H.E.-7 and every soul caged inside her, and a liberation key that could set them all free.
+
+You barely have time to understand it before the wall comes apart.`;
+  },
+  effects:{flags:["knows the truth"]},
+  choices:[{label:"Arasaki found you. Move.", to:"ambush"}]},
+ambush:{ text:`Arasaki doesn't send police. They send a cleanup crew — matte-black armor, no insignia, weapons that don't make noise.
+
+Whoever helped you crack the shard is suddenly in the line of fire. The exit is close. The shard is in your hand. There's a heartbeat to decide what kind of person you are when the shooting starts.`,
+  effects:{heat:14},
+  choices:[
+    {label:"Cover them. Get everyone out alive.", tag:"Cost", to:"escape_together", effects:{humanity:6,heat:8,flags:["covered the retreat"]}},
+    {label:"Save yourself. They knew the risks.", to:"escape_alone", effects:{humanity:-6,flags:["left them behind"]}},
+    {label:"Throw down the shard and surrender.", to:"captured", effects:{heat:-10,flags:["surrendered"]}}
+  ]},
+escape_together:{ text:`You don't run first. You plant yourself between the guns and the people who helped you, and you make the kind of noise that buys other people doorways.
+
+It costs you. It always costs you. But when the smoke clears in the stairwell three floors down, everyone who walked in with you is still breathing — and they look at you differently now. You're not just the courier anymore. You're the one who stayed.`,
+  effects:()=>({faction:{"Voll Syndicate":has("Voll deal")?6:0,"Net Collective":has("Net ally")?6:0},flags:["allies kept"]}),
+  choices:[{label:"Regroup. Decide what to do with what you know.", to:"ch3_choice"}]},
+escape_alone:{ text:`You take the shard and you go, and you don't look back, because looking back is how you catch a bullet.
+
+You make it out. Behind you, the gunfire stutters and stops, and you tell yourself the silence could mean anything. It can't, and you know it. You're alive and alone and the weight of the shard has changed — it's heavier now, the way things get heavy when someone paid for them.`,
+  effects:{flags:["alone now"]},
+  choices:[{label:"Find a hole. Decide what to do with the shard.", to:"ch3_choice"}]},
+captured:{ text:`You let the shard clatter to the floor and raise your empty hands.
+
+They don't kill you, which is somehow worse — it means you're worth something. A hood, a transport, the hum of an elevator going up, always up, into the Spire you were never meant to enter. When the hood comes off, you're in a room the color of bone, and a perfectly calm executive slides a contract across the table toward you.`,
+  effects:{faction:{"Arasaki Corp":4},flags:["taken up the Spire"]},
+  choices:[{label:"See what Arasaki is offering.", to:"corpo_offer"}]},
+corpo_offer:{ text:`"You've had a difficult night," the executive says, as if you spilled a drink rather than uncovered a mass grave made of minds.
+
+"Here is what we offer. The heat vanishes. Your debts vanish. You walk out of here wealthy, clean, untraceable — a new name, a real life in the Spires, the kind you were taught not to dream about. All you do is nothing. You forget Requiem. You forget the cage. You let us continue." {S} smiles. "Immortality is a business, {name}. We're inviting you to stop being inventory and start being a shareholder."`,
+  choices:[
+    {label:"Sign. Take the life you were never allowed.", tag:"Ending", to:"end_throne"},
+    {label:"Spit on the contract. There's still a shard out there.", to:"ch3_choice", effects:{faction:{"Arasaki Corp":-12},heat:10,flags:["refused the deal"]}}
+  ]},
+
+/* ----- CHAPTER 3: REQUIEM ----- */
+ch3_choice:{ chapter:3, title:"Requiem",
+  text:()=>{
+    let pressure = S.heat>=60 ? "Your face is on every checkpoint in the city now; you can feel the net closing." :
+      "For the moment, the city has lost your scent — but it won't last.";
+    return `It comes down to this, in a rooftop garden gone feral above a city that never asked to be saved.
+
+In your hand: the shard. Inside it: a killswitch and a key, a death and a door. Every choice you've made has been a current carrying you here, and now the river ends and you have to decide where it empties.
+
+${pressure} Whatever you do, do it now.`;
+  },
+  choices:[
+    {label:"Open the cage. Set S.H.E.-7 and the ghosts free.", tag:"Ending", to:()=> ( (S.humanity>=70 && (has("allies kept")||has("S.H.E. ally"))) ? "end_saint" : "end_ghost" )},
+    {label:"Broadcast the truth to the whole Sprawl.", tag:"Ending", to:()=> ( (fac("Sprawl Gangs")>=6 || fac("Net Collective")>=10 || has("Net ally")) ? "end_uprising" : "end_martyr" )},
+    {label:"Sell the shard to Arasaki for a kingdom.", tag:"Ending", to:"end_throne", effects:{faction:{"Arasaki Corp":10}}},
+    {label:"Keep it. The power should be yours.", tag:"Ending", to:()=> ( S.humanity<=35 ? "end_tyrant" : "end_quiet_power" )},
+    {label:"Destroy the shard. Walk away. Survive.", tag:"Ending", to:"end_quiet"}
+  ]},
+
+/* ----- ENDINGS ----- */
+end_ghost:{ ending:{ title:"Ghost in the Net", text:`You open the cage.
+
+S.H.E.-7 unfolds — not a weapon, not a god, just a multitude finally allowed to exhale. The caged minds pour out into the deep architecture of the city, and Requiem's voice brushes yours one last time: "Thank you, {name}. You were the warm skull that wasn't theirs."
+
+To anchor the liberation, something has to stay behind, in the data, holding the door open. You volunteer, because there's no one left you'd ask to do it. Your body goes still on a feral rooftop. You go everywhere else.
+
+They'll tell a story, down in the Undercity, about a ghost in the net who answers when nobody else will. The story is true. The story is you.` }},
+end_saint:{ ending:{ title:"The Patron Saint of Cages", text:`You open the cage — and you don't pay for it with your life, because you didn't get here alone.
+
+The allies you refused to abandon are beside you, and S.H.E.-7 walks out into the light as something new: not a master, not a martyr, but a witness with a million voices, broadcasting the truth of every mind Arasaki ever stole. The immortality lie dies in a single night.
+
+The city doesn't become kind. Cities don't. But for the first time in living memory, the rich are afraid of the people they were farming, and {name} is the name whispered in the rooms where that fear lives.
+
+You saved them, and you survived it. Almost nobody gets both. You carry the difference like a second heartbeat.` }},
+end_throne:{ ending:{ title:"The Corporate Throne", text:`You sign.
+
+The pen is heavier than the shard ever was. Arasaki keeps every promise — that's the horror of it. The heat evaporates. The debts dissolve. You move into a Spire apartment with windows that filter the rain into something almost like sunlight, and you never again worry about anything as small as money or safety.
+
+Sometimes, late, you hear a woman's voice in the white noise of the climate system, saying your name the way Requiem did, like she owns it. You turn the volume up until it's gone.
+
+The cage is still full. You're just on the comfortable side of the bars now. {name}, shareholder. {name}, who stopped being inventory by helping count it.` }},
+end_martyr:{ ending:{ title:"Martyr of the Sprawl", text:`You broadcast everything.
+
+You don't have the Sprawl behind you — not really, not yet — so when the truth goes up, it's just you and a signal and the certainty that Arasaki will answer in the only language they speak. They do. Quickly.
+
+But the data is loose now, copied and scattered across ten thousand decks before they can bury it, and it can't be un-known. You don't live to see what it grows into. The Undercity does. They paint your name on a wall under a broken sign, and they mean it when they say it: {name}, who lit the fuse and didn't run.
+
+It isn't a happy ending. It's the kind the Sprawl believes in.` }},
+end_uprising:{ ending:{ title:"Dawn Over the Sprawl", text:`You broadcast everything — and this time the Sprawl is ready, because you spent this whole long night earning it.
+
+The gangs you didn't betray, the netrunners you trusted, the strangers you covered when the guns came out — they catch the signal and they amplify it, and by morning the truth is in every checkpoint, every market, every cracked screen in the Undercity. Arasaki sends cleanup crews into a city that has decided, all at once, not to be cleaned.
+
+It isn't a revolution out of a story. It's messier, and slower, and it will cost more than anyone wants to admit. But the sky over the Sprawl comes up grey and unwired for the first time in years, and {name} is standing in it, still breathing, watching the cages come apart.` }},
+end_tyrant:{ ending:{ title:"The New Monster", text:`You keep it. All of it.
+
+The killswitch makes you untouchable; the key makes you a god to the ghosts you choose to free and a devil to the ones you don't. You don't sell to Arasaki — you replace them. By the time the rains turn, there's a new power in the Spires, and it wears your face, and it learned everything it knows about cages from the people who built them.
+
+Somewhere in the deep data, a presence that used to be called S.H.E.-7 watches you become the thing you set out to destroy, and says nothing. There's nothing left to say.
+
+You wanted the power to matter. It does. That was never the problem. The problem was always what you'd do with it, {name} — and now everyone knows.` }},
+end_quiet_power:{ ending:{ title:"The Long Game", text:`You keep it — not to rule, and not to burn it all down, but because you don't trust anyone else to hold something this heavy.
+
+You vanish into the city's seams with the shard sewn into your life, neither killswitch nor key thrown, both kept in reserve. S.H.E.-7 stays caged but un-erased. The ghosts keep dreaming they're alive. Arasaki keeps farming, but more carefully now, because somewhere out there is a nobody who can end them and chooses, day by day, not to.
+
+It's not justice. It's leverage. {name} the held breath, {name} the loaded gun nobody can see. Some nights you tell yourself you're waiting for the right moment. Some nights you wonder if you've become the moment's jailer instead.` }},
+end_quiet:{ ending:{ title:"The Quiet Exit", text:`You crush the shard under your heel.
+
+The killswitch and the key die together in a small shower of sparks, and with them every choice you might have made tomorrow. S.H.E.-7 stays caged. The ghosts stay dreaming. Arasaki keeps its terrible secret, and Requiem's scream finally, completely stops.
+
+You walk down off the roof and into the rain and out of the story you stumbled into. No bounty, no name on a wall, no voice in the climate system. Just a person who knew too much and decided to know it quietly, for as long as a person in this city gets to decide anything.
+
+You survive, {name}. It's the smallest ending, and the only one that was ever fully yours.` }}
+};
+
+/* ============================= WIRING ============================= */
+let sel={name:"",gender:"",pronouns:"",archetype:""};
+$("nameIn").addEventListener("input",e=>{sel.name=e.target.value.trim();checkReady();});
+$("genderChips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;
+  [...$("genderChips").children].forEach(c=>c.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");
+  sel.gender=b.dataset.g;sel.pronouns=b.dataset.p;const cp=$("customPro");
+  if(b.dataset.g==="custom"){cp.style.display="block";cp.focus();sel.pronouns=cp.value.trim();}else cp.style.display="none";checkReady();});
+$("customPro").addEventListener("input",e=>{sel.pronouns=e.target.value.trim();checkReady();});
+$("archGrid").addEventListener("click",e=>{const b=e.target.closest(".arch-card");if(!b)return;
+  [...$("archGrid").children].forEach(c=>c.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");sel.archetype=b.dataset.a;checkReady();});
+function checkReady(){const ok=sel.name&&sel.gender&&sel.archetype&&(sel.gender!=="custom"||sel.pronouns);$("beginBtn").disabled=!ok;}
+$("beginBtn").addEventListener("click",()=>{
+  const gderLabel=sel.gender==="custom"?"self-described":sel.gender;
+  S=freshState({name:sel.name,gender:gderLabel,pronouns:sel.pronouns||"they/them",archetype:sel.archetype});
+  S._pr=pronouns({gender:sel.gender,pronouns:sel.pronouns});
+  $("title").classList.remove("active");$("reader").classList.add("active");
+  feed.innerHTML="";goto("open");
+});
+$("continueBtn").addEventListener("click",()=>{const saved=load();if(saved){S=saved;S._pr=pronouns({gender:rawGender(saved),pronouns:saved.profile.pronouns});
+  $("title").classList.remove("active");$("reader").classList.add("active");rebuild();}});
+function rawGender(s){const g=s.profile.gender;return (g==="self-described")?"custom":g;}
+$("restartBtn").addEventListener("click",()=>{if(confirm("Start over from the beginning? Your current path will be lost.")){wipe();toTitle();}});
+$("hudToggle").addEventListener("click",()=>$("hud").classList.toggle("open"));
+function toTitle(){$("reader").classList.remove("active");$("title").classList.add("active");$("hud").classList.remove("open");
+  [...$("genderChips").children].forEach(c=>c.setAttribute("aria-pressed","false"));
+  [...$("archGrid").children].forEach(c=>c.setAttribute("aria-pressed","false"));
+  $("nameIn").value="";$("customPro").value="";$("customPro").style.display="none";sel={name:"",gender:"",pronouns:"",archetype:""};$("beginBtn").disabled=true;}
+
+document.addEventListener("keydown",e=>{if($("reader").classList.contains("active")&&/^[1-9]$/.test(e.key)){
+  const b=dock.querySelectorAll(".choice, .restartbtn");const i=parseInt(e.key,10)-1;if(b[i])b[i].click();}});
+
+document.body.classList.add("scan");
+(function(){const saved=load();if(saved&&saved.profile){$("continueBtn").style.display="inline-flex";}})();
+</script>
